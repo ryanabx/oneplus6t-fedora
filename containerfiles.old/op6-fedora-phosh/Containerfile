@@ -1,0 +1,28 @@
+FROM docker.io/maggu2810/op6-fedora:latest
+
+#RUN dnf5 group install -y --with-optional phosh-desktop
+RUN dnf install -y @phosh-desktop-environment
+
+RUN mkdir -p /var/lib/AccountsService/users/ && \
+    echo '[User]' > /var/lib/AccountsService/users/unpriv && \
+    echo 'Session=phosh' >> /var/lib/AccountsService/users/unpriv && \
+    echo 'Icon=/home/unpriv/.face' >> /var/lib/AccountsService/users/unpriv && \
+    echo 'SystemAccount=false' >> /var/lib/AccountsService/users/unpriv
+
+RUN dnf5 install -y gnome-console && \
+    mkdir -p /usr/local/share/applications/ && echo -e '\
+[Desktop Entry]\n\
+Name=update-all\n\
+Exec=kgx -T update-all -- sudo update-all\n\
+Icon=org.gnome.Console\n\
+Terminal=false\n\
+Type=Application\n\
+Categories=System;TerminalEmulator;X-GNOME-Utilities;GTK;GNOME;\n\
+StartupNotify=true\n\
+DBusActivatable=true\n\
+X-GNOME-UsesNotifications=true\n\
+X-Purism-FormFactor=Workstation;Mobile;\n\
+' >> /usr/local/share/applications/update-all.desktop && \
+    chmod 0644 /usr/local/share/applications/update-all.desktop
+
+ENTRYPOINT ["/bin/bash", "-l", "-i"]

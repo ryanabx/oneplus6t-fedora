@@ -1,0 +1,10 @@
+MY_ABS="$(realpath -e "${BASH_SOURCE[0]}")"
+MY_DIR="$(dirname "${MY_ABS}")"
+
+[[ -z ${MY_REGISTRY+x} ]] && export MY_REGISTRY="docker.io"
+[[ -z ${MY_TAG+x} ]] && export MY_TAG="latest"
+[[ -z ${MY_ARCH+x} ]] && export MY_ARCH="aarch64"
+[[ -z ${MY_CME+x} ]] && export MY_CME="podman"
+
+"${MY_DIR}"/show-vars.sh
+
