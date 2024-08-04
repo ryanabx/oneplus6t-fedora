@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ## Podman Stuff to prepare Fedora userdata fs contents
 podman image build --arch aarch64 -t "fedora-aarch64-device.i" -f ./containerfile/Containerfile
 ## Run this once to generate the container:

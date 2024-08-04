@@ -21,17 +21,20 @@ COPY hostname /etc/hostname
 RUN dnf5 install -y openssh-server && \
   systemctl enable sshd
 
-RUN dnf copr enable -y maggu2810/op6
+RUN dnf5 install -y pd-mapper rmtfs qrtr 
+RUN dnf copr enable -y ryanabx/op6
 
-RUN dnf5 install -y device-oneplus-enchilada
+# RUN dnf5 install -y device-oneplus-enchilada
+# Install copr packages
+RUN dnf5 install -y qbootctl
 
 RUN systemctl enable pd-mapper
 RUN systemctl enable qbootctl-mark-boot-successful.service
-RUN systemctl enable tqftpserv
+# RUN systemctl enable tqftpserv
 RUN systemctl enable rmtfs
 
-RUN /usr/bin/pmos-chroot-setup
-RUN /usr/bin/pmos-adopt-and-integrate
+# RUN /usr/bin/pmos-chroot-setup
+# RUN /usr/bin/pmos-adopt-and-integrate
 
 RUN echo 'root:654321' | chpasswd 
 

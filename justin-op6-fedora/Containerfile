@@ -40,7 +40,7 @@ RUN dnf5 install -y nano \
                     util-linux-user
 
 # Install SDM845 Packages
-RUN dnf5 instal -y pd-mapper \
+RUN dnf5 install -y pd-mapper \
                    qbootctl \
                    rmtfs \
                    tqftpserv
