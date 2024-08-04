@@ -1,9 +1,9 @@
 #!/bin/bash
 
 sudo umount -R mnt
-export IMG_PATH="${PWD}/oneplus-enchilada-fedora.img"
+export IMG_PATH="${PWD}/oneplus-fajita-fedora.img"
 rm -rf "${IMG_PATH}"
-rm -rf oneplus-enchilada-fedora.simg
+rm -rf oneplus-fajita-fedora.simg
 rm -rf initramfs
 rm -rf initramfs-extra
 rm -rf mnt
