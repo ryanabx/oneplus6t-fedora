@@ -17,9 +17,6 @@ RUN dnf5 install -y \
   systemd \
   systemd-udev
 
-# RUN dnf5 install -y openssh-server && \
-#   systemctl enable sshd
-
 RUN dnf5 install -y \
   'dnf-command(copr)' \
   tmux vim \
@@ -35,17 +32,5 @@ RUN dnf copr enable -y ryanabx/op6 && \
 RUN systemctl enable pd-mapper && \
     systemctl enable qbootctl-mark-boot-successful.service && \
     systemctl enable rmtfs
-
-RUN install -d -o 0 -g 0 -m 0755 /sda17p2
-
-COPY resources/pmos-adopt-and-integrate /usr/bin/pmos-adopt-and-integrate
-COPY resources/pmos-chroot-adv /usr/bin/pmos-chroot-adv
-COPY resources/update-all /usr/local/bin/update-all
-
-RUN echo 'root:654321' | chpasswd 
-
-RUN groupadd -g 1000 unpriv && \
-  useradd -g 1000 -G wheel -m -u 1000 unpriv && \
-  echo 'unpriv:123456' | chpasswd
 
 CMD ["/bin/bash", "-l", "-i"]
