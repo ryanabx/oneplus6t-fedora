@@ -1,24 +1,9 @@
+#!/bin/bash
+
 # EXPORTS AND CLEANUPS
-
-export PMOS_MOUNT_DIR="${PWD}/pmos-mnt"
-export PMOS_IMG_PATH="${PWD}/pmos-oneplus.img"
-
-export MOUNT_DIR="${PWD}/mnt"
-export IMG_PATH="${PWD}/pmos-fedora-hybrid.img"
-
-sudo umount -R $PMOS_MOUNT_DIR
-sudo losetup -d /dev/loop0
-sudo rm -rf $PMOS_MOUNT_DIR
-sudo rm -rf $PMOS_IMG_PATH
-
-for i in $(podman ps -a | grep "fedora-aarch64-device.c" | cut -d " " -f 1);do podman rm ${i};done
+source ./cleanup.sh
 
 
-# CLEANUP BEFORE ACTUAL IMAGE
-sudo umount -R $MOUNT_DIR
-sudo losetup -d /dev/loop1
-sudo rm -rf $MOUNT_DIR
-sudo rm -rf $IMG_PATH
 
 # ================================================= #
 echo "PMOS IMAGE"
@@ -57,12 +42,14 @@ sudo mount "${DEV_ROOT}" "${MOUNT_DIR}"
 sudo mkdir -p "${MOUNT_DIR}/boot"
 sudo mount "${DEV_BOOT}" "${MOUNT_DIR}/boot"
 # RUN DOCKER
-podman image build --arch aarch64 -t "fedora-aarch64-device.i" -f Containerfile
+echo "PODMAN BUILD"
+podman image build --rm --arch aarch64 -t "fedora-aarch64-device.i" -f Containerfile
+echo "PODMAN RUN"
 podman run --arch aarch64 -it --name "fedora-aarch64-device.c" localhost/"fedora-aarch64-device.i":latest
-
+echo "PODMAN EXPORT"
 # FILL ROOTFS WITH DOCKER CONTAINER
 podman export fedora-aarch64-device.c | sudo tar -C mnt/ -xp
-
+echo "CONTINUE"
 sudo mkdir -p mnt/lib/firmware
 ## pmos-adopt-and-integrate
 sudo cp -ax "${PMOS_MOUNT_DIR}"/boot/ "${MOUNT_DIR}"/
@@ -77,8 +64,6 @@ sudo cp -ax "${PMOS_MOUNT_DIR}"/usr/share/alsa/ucm2/ "${MOUNT_DIR}"/usr/share/al
 # sudo losetup -d "${DEV_ROOT_PMOS}"
 
 # CREATE FLASHABLE IMAGE
-
-export SIMG_PATH="${IMG_PATH}.simg"
 
 img2simg "${IMG_PATH}" "${SIMG_PATH}"
 

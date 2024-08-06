@@ -48,4 +48,4 @@ RUN groupadd -g 1000 unpriv && \
   useradd -g 1000 -G wheel -m -u 1000 unpriv && \
   echo 'unpriv:123456' | chpasswd
 
-ENTRYPOINT ["/bin/bash", "-l", "-i"]
+CMD ["/bin/bash", "-l", "-i"]
