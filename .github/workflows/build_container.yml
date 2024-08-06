@@ -38,7 +38,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           containerfiles: |
-            main-container/Containerfile
+            Containerfile
           image: oneplus-fedora-container
           archs: arm64
 
