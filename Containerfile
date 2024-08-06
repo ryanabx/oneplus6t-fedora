@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora:latest
+FROM fedora:latest
 
 RUN dnf upgrade -y --refresh && dnf install -y dnf5 dnf5-plugins
 
