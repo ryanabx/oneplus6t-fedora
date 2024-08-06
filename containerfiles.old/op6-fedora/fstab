@@ -1,4 +1,0 @@
-/dev/mapper/sda17p2  /         btrfs  rw,relatime,subvol=/fedora  0 0
-/dev/mapper/sda17p1  /boot     ext2   rw,relatime                 0 0
-/dev/mapper/sda17p2  /pmos     btrfs  rw,relatime,subvol=/pmos    0 0
-/dev/mapper/sda17p2  /sda17p2  btrfs  rw,relatime,subvolid=5      0 0

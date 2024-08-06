@@ -1,7 +1,0 @@
-MY_ABS="$(realpath -e "${BASH_SOURCE[0]}")"
-MY_DIR="$(dirname "${MY_ABS}")"
-
-[[ -z ${MY_IMAGE+x} ]] && export MY_IMAGE="maggu2810/op6-fedora-plasma-mobile"
-[[ -z ${MY_CONTAINER+x} ]] && export MY_CONTAINER="op6-fedora-plasma-mobile"
-
-. "${MY_DIR}"/../my-env

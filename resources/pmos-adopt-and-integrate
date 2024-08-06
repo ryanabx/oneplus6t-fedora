@@ -1,0 +1,17 @@
+#!/bin/sh
+
+if [ "$#" -eq 0 ]; then
+  SRC=/sda17p2/pmos
+  DST=/sda17p2/fedora
+elif [ "$#" -eq 2 ]; then
+  SRC="${1}"; shift
+  DST="${1}"; shift
+else
+  echo "cannot detect source and destination" 2>&1
+  exit 1
+fi
+
+cp -ax "${SRC}"/boot/ "${DST}"/
+cp -ax "${SRC}"/lib/modules/ "${DST}"/lib/
+cp -ax "${SRC}"/lib/firmware/ "${DST}"/lib/
+cp -ax "${SRC}"/usr/share/alsa/ucm2/ "${DST}"/usr/share/alsa/

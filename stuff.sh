@@ -1,0 +1,85 @@
+# EXPORTS AND CLEANUPS
+
+export PMOS_MOUNT_DIR="${PWD}/pmos-mnt"
+export PMOS_IMG_PATH="${PWD}/pmos-oneplus.img"
+
+export MOUNT_DIR="${PWD}/mnt"
+export IMG_PATH="${PWD}/pmos-fedora-hybrid.img"
+
+sudo umount -R $PMOS_MOUNT_DIR
+sudo losetup -d /dev/loop0
+sudo rm -rf $PMOS_MOUNT_DIR
+sudo rm -rf $PMOS_IMG_PATH
+
+for i in $(podman ps -a | grep "fedora-aarch64-device.c" | cut -d " " -f 1);do podman rm ${i};done
+
+
+# CLEANUP BEFORE ACTUAL IMAGE
+sudo umount -R $MOUNT_DIR
+sudo losetup -d /dev/loop1
+sudo rm -rf $MOUNT_DIR
+sudo rm -rf $IMG_PATH
+
+# ================================================= #
+echo "PMOS IMAGE"
+
+simg2img /tmp/postmarketOS-export/oneplus-fajita.img pmos-oneplus.img
+
+export LOOP_IMG_PMOS="$(sudo losetup -P -f "${PMOS_IMG_PATH}" -b 4096 --show)"
+export DEV_BOOT_PMOS="${LOOP_IMG_PMOS}p1"
+export DEV_ROOT_PMOS="${LOOP_IMG_PMOS}p2"
+mkdir -p $PMOS_MOUNT_DIR
+sudo mount "${DEV_ROOT_PMOS}" $PMOS_MOUNT_DIR
+sudo mkdir -p $PMOS_MOUNT_DIR/boot
+sudo mount "${DEV_BOOT_PMOS}" $PMOS_MOUNT_DIR/boot
+
+# ======================================== #
+echo "ACTUAL IMAGE"
+
+truncate -s 5G "${IMG_PATH}"
+
+# EXPORT DEV_IMG
+export DEV_IMG="$(sudo losetup -P -f "${IMG_PATH}" -b 4096 --show)"
+# MAKE PARTITIONS
+sudo parted -s "${DEV_IMG}" mktable msdos
+sudo parted -s "${DEV_IMG}" mkpart primary ext2 2048s 256M
+sudo parted -s "${DEV_IMG}" mkpart primary 256M 100%
+sudo parted -s "${DEV_IMG}" set 1 boot on
+# EXPORT VARIABLES
+export DEV_BOOT="${DEV_IMG}p1"
+export DEV_ROOT="${DEV_IMG}p2"
+# MAKE FILESYSTEMS
+sudo mkfs.ext4 -O ^metadata_csum -F -q -L pmOS_root -N 100000 "${DEV_ROOT}"
+sudo mkfs.ext2 -F -q -L pmOS_boot "${DEV_BOOT}"
+# MOUNT PARTITIONS
+mkdir -p "${MOUNT_DIR}"
+sudo mount "${DEV_ROOT}" "${MOUNT_DIR}"
+sudo mkdir -p "${MOUNT_DIR}/boot"
+sudo mount "${DEV_BOOT}" "${MOUNT_DIR}/boot"
+# RUN DOCKER
+podman image build --arch aarch64 -t "fedora-aarch64-device.i" -f Containerfile
+podman run --arch aarch64 -it --name "fedora-aarch64-device.c" localhost/"fedora-aarch64-device.i":latest
+
+# FILL ROOTFS WITH DOCKER CONTAINER
+podman export fedora-aarch64-device.c | sudo tar -C mnt/ -xp
+
+sudo mkdir -p mnt/lib/firmware
+## pmos-adopt-and-integrate
+sudo cp -ax "${PMOS_MOUNT_DIR}"/boot/ "${MOUNT_DIR}"/
+sudo cp -ax "${PMOS_MOUNT_DIR}"/lib/modules/ "${MOUNT_DIR}"/lib/
+sudo cp -ax "${PMOS_MOUNT_DIR}"/lib/firmware/ "${MOUNT_DIR}"/lib/
+sudo cp -ax "${PMOS_MOUNT_DIR}"/usr/share/alsa/ucm2/ "${MOUNT_DIR}"/usr/share/alsa/
+
+# UNMOUNT IMAGES
+# sudo umount -R "${MOUNT_DIR}"
+# sudo umount -R "${PMOS_MOUNT_DIR}"
+# sudo losetup -d "${DEV_IMG}"
+# sudo losetup -d "${DEV_ROOT_PMOS}"
+
+# CREATE FLASHABLE IMAGE
+
+export SIMG_PATH="${IMG_PATH}.simg"
+
+img2simg "${IMG_PATH}" "${SIMG_PATH}"
+
+echo "DONE! At ${SIMG_PATH}"

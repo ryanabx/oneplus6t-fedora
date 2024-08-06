@@ -1,0 +1,7 @@
+= OnePlus 6T on Fedora
+
+NOTE: This is a work-in-progress! PRs welcome though :)
+
+== Current Steps
+
+See: xref:STEPS.adoc[STEPS.adoc]

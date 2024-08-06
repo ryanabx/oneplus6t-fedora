@@ -1,0 +1,23 @@
+= Working steps
+
+== Get the postmarketOS image
+
+[source,bash]
+----
+# oneplus-enchilada [6] OR oneplus-fajita [6T]
+pmbootstrap init
+pmbootstrap install
+pmbootstrap export
+
+simg2img /tmp/postmarketOS-export/oneplus-fajita.img pmos-oneplus.img
+
+export PMOS_IMG_PATH="$(pwd)/pmos-oneplus.img"
+export LOOP_IMG_PMOS="$(sudo losetup -P -f "${PMOS_IMG_PATH}" -b 4096 --show)"
+mkdir mnt-pmos
+mkdir -p mnt-pmos
+sudo mount "${DEV_ROOT}" mnt-pmos
+sudo mkdir -p mnt-pmos/boot
+sudo mount "${DEV_BOOT}" mnt-pmos/boot
+----
+
+== Prepare the Fedora image

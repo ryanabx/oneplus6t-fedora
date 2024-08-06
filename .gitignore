@@ -1,3 +1,4 @@
-mnt/
-oneplus-fajita-fedora.img
-boot.img
+mnt
+pmos-mnt
+pmos-fedora-hybrid.img
+pmos-oneplus.img
