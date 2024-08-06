@@ -3,8 +3,6 @@
 # EXPORTS AND CLEANUPS
 source ./cleanup.sh
 
-
-
 # ================================================= #
 echo "PMOS IMAGE"
 
