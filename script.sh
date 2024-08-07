@@ -40,10 +40,13 @@ sudo mount "${DEV_ROOT}" "${MOUNT_DIR}"
 sudo mkdir -p "${MOUNT_DIR}/boot"
 sudo mount "${DEV_BOOT}" "${MOUNT_DIR}/boot"
 # RUN DOCKER
-echo "PODMAN BUILD"
-podman image build --rm --arch aarch64 -t "fedora-aarch64-device.i" -f Containerfile
-echo "PODMAN RUN"
-podman run --arch aarch64 -it --name "fedora-aarch64-device.c" localhost/"fedora-aarch64-device.i":latest
+# echo "PODMAN BUILD"
+# podman image build --rm --arch aarch64 -t "fedora-aarch64-device.i" -f Containerfile
+# echo "PODMAN RUN"
+# podman run --arch aarch64 -it --name "fedora-aarch64-device.c" localhost/"fedora-aarch64-device.i":latest
+echo "PODMAN CONTAINER BUILD"
+podman pull ghcr.io/ryanabx/oneplus-fedora-container:latest
+podman container create --arch "aarch64" -it --name "fedora-aarch64-device.c" "ghcr.io/ryanabx/oneplus-fedora-container:latest"
 echo "PODMAN EXPORT"
 # FILL ROOTFS WITH DOCKER CONTAINER
 podman export fedora-aarch64-device.c | sudo tar -C mnt/ -xp
