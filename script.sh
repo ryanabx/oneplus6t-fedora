@@ -6,7 +6,7 @@ source ./cleanup.sh
 # ================================================= #
 echo "PMOS IMAGE"
 
-simg2img /tmp/postmarketOS-export/oneplus-fajita.img pmos-oneplus.img
+simg2img /tmp/postmarketOS-export/oneplus-fajita.img "${PMOS_IMG_PATH}"
 
 export LOOP_IMG_PMOS="$(sudo losetup -P -f "${PMOS_IMG_PATH}" -b 4096 --show)"
 export DEV_BOOT_PMOS="${LOOP_IMG_PMOS}p1"
@@ -23,6 +23,7 @@ truncate -s 5G "${IMG_PATH}"
 
 # EXPORT DEV_IMG
 export DEV_IMG="$(sudo losetup -P -f "${IMG_PATH}" -b 4096 --show)"
+
 # MAKE PARTITIONS
 sudo parted -s "${DEV_IMG}" mktable msdos
 sudo parted -s "${DEV_IMG}" mkpart primary ext2 2048s 256M
@@ -39,6 +40,9 @@ mkdir -p "${MOUNT_DIR}"
 sudo mount "${DEV_ROOT}" "${MOUNT_DIR}"
 sudo mkdir -p "${MOUNT_DIR}/boot"
 sudo mount "${DEV_BOOT}" "${MOUNT_DIR}/boot"
+
+# TEST
+sudo cp -r "${PMOS_MOUNT_DIR}/*" "${MOUNT_DIR}/"
 # RUN DOCKER
 # echo "PODMAN BUILD"
 # podman image build --rm --arch aarch64 -t "fedora-aarch64-device.i" -f Containerfile
@@ -49,7 +53,7 @@ podman pull ghcr.io/ryanabx/oneplus-fedora-container:latest
 podman container create --arch "aarch64" -it --name "fedora-aarch64-device.c" "ghcr.io/ryanabx/oneplus-fedora-container:latest"
 echo "PODMAN EXPORT"
 # FILL ROOTFS WITH DOCKER CONTAINER
-podman export fedora-aarch64-device.c | sudo tar -C mnt/ -xp
+podman export fedora-aarch64-device.c | sudo tar -C "${MOUNT_DIR}" -xp
 echo "CONTINUE"
 sudo mkdir -p mnt/lib/firmware
 ## pmos-adopt-and-integrate
